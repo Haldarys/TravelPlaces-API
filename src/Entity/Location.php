@@ -11,6 +11,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Filter\BoundsFilter;
 use App\Repository\LocationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -99,6 +101,17 @@ class Location
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Groups(['location:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    /**
+     * @var Collection<int, LocationImage>
+     */
+    #[ORM\OneToMany(targetEntity: LocationImage::class, mappedBy: 'Location', orphanRemoval: true)]
+    private Collection $locationImages;
+
+    public function __construct()
+    {
+        $this->locationImages = new ArrayCollection();
+    }
 
     #[ORM\PrePersist]
     public function onPrePersist(): void
@@ -197,5 +210,35 @@ class Location
     }
     public function getUpdatedAt(): ?\DateTimeImmutable {
         return $this->updatedAt;
+    }
+
+    /**
+     * @return Collection<int, LocationImage>
+     */
+    public function getLocationImages(): Collection
+    {
+        return $this->locationImages;
+    }
+
+    public function addLocationImage(LocationImage $locationImage): static
+    {
+        if (!$this->locationImages->contains($locationImage)) {
+            $this->locationImages->add($locationImage);
+            $locationImage->setLocation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLocationImage(LocationImage $locationImage): static
+    {
+        if ($this->locationImages->removeElement($locationImage)) {
+            // set the owning side to null (unless already changed)
+            if ($locationImage->getLocation() === $this) {
+                $locationImage->setLocation(null);
+            }
+        }
+
+        return $this;
     }
 }
