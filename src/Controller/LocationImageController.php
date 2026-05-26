@@ -32,6 +32,7 @@ final class LocationImageController extends AbstractController
 
         $filename = uniqid() . '.' . $file->guessExtension();
         $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/locations';
+        $position = count($location->getLocationImages());
 
         $file->move($uploadDir, $filename);
 
@@ -39,7 +40,7 @@ final class LocationImageController extends AbstractController
         $image->setLocation($location);
         $image->setFilename($filename);
         $image->setMimeType($mimeType);
-        $image->setPosition(0);
+        $image->setPosition($position);
 
         $em->persist($image);
         $em->flush();
