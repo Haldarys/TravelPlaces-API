@@ -6,20 +6,23 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Link;
 use App\Repository\LocationImageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 #[ORM\Entity(repositoryClass: LocationImageRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [
         new Get(),
-        new GetCollection(),
-        new Post(),
-        new Patch(),
+        new GetCollection(
+            uriTemplate: '/locations/{id}/images',
+            uriVariables: [
+                'id' => new Link(fromClass: Location::class, toProperty: 'Location')
+            ]
+        ),
         new Delete(),
     ],
     normalizationContext: ['groups' => ['location_image:read']],
@@ -30,27 +33,29 @@ class LocationImage
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['location_image:read', 'location:read'])]
     private ?int $id = null;
     
     #[ORM\ManyToOne(inversedBy: 'locationImages')]
-    #[Groups(['location_image:read'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[SerializedName('location')]
+    #[Groups(['location_image:read'])]
     private ?Location $Location = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['location_image:read'])]
+    #[Groups(['location_image:read', 'location:read'])]
     private ?string $filename = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['location_image:read'])]
+    #[Groups(['location_image:read', 'location:read'])]
     private ?string $mimeType = null;
 
     #[ORM\Column]
-    #[Groups(['location_image:read', 'location_image:write'])]
+    #[Groups(['location_image:read', 'location_image:write', 'location:read'])]
     private ?int $position = null;
 
     #[ORM\Column]
-    #[Groups(['location_image:read'])]
+    #[Groups(['location_image:read', 'location:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\PrePersist]

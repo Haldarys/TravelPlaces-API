@@ -16,6 +16,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 #[ORM\Entity(repositoryClass: LocationRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -102,10 +103,9 @@ class Location
     #[Groups(['location:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    /**
-     * @var Collection<int, LocationImage>
-     */
     #[ORM\OneToMany(targetEntity: LocationImage::class, mappedBy: 'Location', orphanRemoval: true)]
+    #[SerializedName('images')]
+    #[Groups(['location:read'])]
     private Collection $locationImages;
 
     public function __construct()
