@@ -23,7 +23,12 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
                 'id' => new Link(fromClass: Location::class, toProperty: 'Location')
             ]
         ),
-        new Delete(),
+        new Delete(uriTemplate: '/locations/{locationId}/images/{id}',
+            uriVariables: [
+                'locationId' => new Link(fromClass: Location::class, toProperty: 'Location'),
+                'id' => new Link(fromClass: LocationImage::class)
+            ]
+        ),
     ],
     normalizationContext: ['groups' => ['location_image:read']],
     denormalizationContext: ['groups' => ['location_image:write']],
@@ -57,6 +62,8 @@ class LocationImage
     #[ORM\Column]
     #[Groups(['location_image:read', 'location:read'])]
     private ?\DateTimeImmutable $createdAt = null;
+
+    // --- Event Listeners ---
 
     #[ORM\PrePersist]
     public function onPrePersist(): void
