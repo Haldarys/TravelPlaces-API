@@ -48,4 +48,40 @@ final class LocationImageController extends AbstractController
 
         return new JsonResponse(['filename' => $result['filename']], 201);
     }
+
+    #[Route('/api/locations/{id}/images', name: 'location_image_reorder', methods: ['PATCH'])]
+    public function reorder(
+        Location $location,
+        Request $request,
+    ): JsonResponse {
+        // TODO: Add order validation
+        $data = json_decode($request->getContent(), true);
+
+        if (!is_array($data)) {
+            return new JsonResponse(['error' => 'Invalid data'], 400);
+        }
+
+        $images = $location->getLocationImages();
+
+        foreach($data as $imageToUpdate) {
+            $id = $imageToUpdate['id'] ?? null;
+            $position = $imageToUpdate['position'] ?? null;
+
+            if ($id === null || $position === null) {
+                return new JsonResponse(['error' => 'Missing id or position'], 400);
+            }
+
+            $image = $images->findFirst(fn($key, $img) => $img->getId() === $id);
+
+            if (!$image) {
+                return new JsonResponse(['error' => "Image $id not found"], 404);
+            }
+
+            $image->setPosition($position);
+        }
+
+        $this->em->flush();
+
+        return new JsonResponse(null, 204);
+    }
 }
