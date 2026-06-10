@@ -49,7 +49,7 @@ final class LocationImageController extends AbstractController
         return new JsonResponse(['filename' => $result['filename']], 201);
     }
 
-    #[Route('/api/locations/{id}/images', name: 'location_image_reorder', methods: ['PATCH'])]
+    #[Route('/api/locations/{id}/images/reorder', name: 'location_image_reorder', methods: ['PATCH'])]
     public function reorder(
         Location $location,
         Request $request,
