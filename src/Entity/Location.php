@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
@@ -36,6 +37,7 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
         ),
         new Post(),
         new Patch(),
+        new Delete(),
     ],
     normalizationContext: ['groups' => ['location:read']],
     denormalizationContext: ['groups' => ['location:write']],
